@@ -1,0 +1,92 @@
+[
+  {
+    "name": "MacBook Air 15 M3",
+    "brand": "Apple",
+    "price": 1299.99,
+    "quantityInStock": 25
+  },
+  {
+    "name": "iPad Pro 11-inch",
+    "brand": "Apple",
+    "price": 799.00,
+    "quantityInStock": 40
+  },
+  {
+    "name": "AirPods Pro 2",
+    "brand": "Apple",
+    "price": 249.00,
+    "quantityInStock": 75
+  },
+  {
+    "name": "MX Master 3S Wireless Mouse",
+    "brand": "Logitech",
+    "price": 99.99,
+    "quantityInStock": 120
+  },
+  {
+    "name": "MX Keys Mini Mechanical Keyboard",
+    "brand": "Logitech",
+    "price": 109.50,
+    "quantityInStock": 60
+  },
+  {
+    "name": "Brio 4K Ultra HD Webcam",
+    "brand": "Logitech",
+    "price": 169.00,
+    "quantityInStock": 35
+  },
+  {
+    "name": "WH-1000XM5 Wireless Headphones",
+    "brand": "Sony",
+    "price": 398.00,
+    "quantityInStock": 50
+  },
+  {
+    "name": "PlayStation 5 DualSense Controller",
+    "brand": "Sony",
+    "price": 69.99,
+    "quantityInStock": 90
+  },
+  {
+    "name": "Alpha 7 IV Mirrorless Camera",
+    "brand": "Sony",
+    "price": 2499.00,
+    "quantityInStock": 12
+  },
+  {
+    "name": "UltraSharp 27 4K USB-C Monitor",
+    "brand": "Dell",
+    "price": 579.99,
+    "quantityInStock": 30
+  },
+  {
+    "name": "XPS 13 Laptop",
+    "brand": "Dell",
+    "price": 1149.00,
+    "quantityInStock": 20
+  },
+  {
+    "name": "990 PRO 2TB NVMe SSD",
+    "brand": "Samsung",
+    "price": 169.99,
+    "quantityInStock": 85
+  },
+  {
+    "name": "Galaxy Tab S9 Ultra",
+    "brand": "Samsung",
+    "price": 1199.99,
+    "quantityInStock": 18
+  },
+  {
+    "name": "Odyssey Neo G9 Gaming Monitor",
+    "brand": "Samsung",
+    "price": 1799.00,
+    "quantityInStock": 8
+  },
+  {
+    "name": "T7 Shield 1TB Portable SSD",
+    "brand": "Samsung",
+    "price": 109.99,
+    "quantityInStock": 110
+  }
+]
