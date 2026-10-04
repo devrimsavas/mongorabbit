@@ -1,3 +1,4 @@
+//service send from order to RabbitMQ 
 using System.ComponentModel.Design.Serialization;
 using System.Text;
 using System.Text.Json;

@@ -27,6 +27,8 @@ builder.Services.AddSingleton<MongoOrderService>();
 
 //RabbitMQ 
 builder.Services.AddSingleton<RabbitMQPublisher>();
+//Rabbit Consumer 
+builder.Services.AddHostedService<OrderProcessingConsumer>();
 
 
 //controllers added 
