@@ -25,6 +25,10 @@ builder.Services.AddCors(options=>
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddSingleton<MongoOrderService>();
 
+//RabbitMQ 
+builder.Services.AddSingleton<RabbitMQPublisher>();
+
+
 //controllers added 
 builder.Services.AddControllers();
 
