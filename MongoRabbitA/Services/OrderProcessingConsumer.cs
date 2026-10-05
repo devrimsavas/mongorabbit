@@ -62,10 +62,14 @@ namespace MongoRabbitA.Services
 
                         if (updatedProduct != null)
                         {
-                            _logger.LogInformation("Stock decreased successfully. Remaining stock: {Stock}", updatedProduct.QuantityInStock);
+                            //stock sufficient decrease stock 
+                            await _orderService.UpdateOrderStatusAsync(orderEvent.OrderId,OrderStatus.Completed);
+                            _logger.LogInformation(" Order {OrderId} Completed. Remaining stock: {Stock}", orderEvent.OrderId,updatedProduct.QuantityInStock);
                         }
                         else
                         {
+                            //Stock insufficient.Cancel Order
+                            await _orderService.UpdateOrderStatusAsync(orderEvent.OrderId,OrderStatus.Cancelled);
                             _logger.LogWarning("Insufficient stock or product not found for ProductId: {ProductId}", orderEvent.ProductId);
                         }
                     }
@@ -76,6 +80,7 @@ namespace MongoRabbitA.Services
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to process message {DeliveryTag}", ea.DeliveryTag);
+                    //requeue false: this message is wrong. delete from queue
                     await channel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
                 }
             };
