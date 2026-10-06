@@ -25,6 +25,7 @@ namespace MongoRabbitA.Services
             using var connection=await _factory.CreateConnectionAsync();
             using var channel=await connection.CreateChannelAsync();
             //declare queue if it does not exist
+            /*
             await channel.QueueDeclareAsync(
                 queue:QueueName,
                 durable:true,
@@ -32,6 +33,7 @@ namespace MongoRabbitA.Services
                 autoDelete:false,
                 arguments:null
             );
+            */
             //serialize event model to JSON bytes
             var jsonString=JsonSerializer.Serialize(orderEvent);
             var body=Encoding.UTF8.GetBytes(jsonString);

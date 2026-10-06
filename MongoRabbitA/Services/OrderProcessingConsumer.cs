@@ -31,13 +31,51 @@ namespace MongoRabbitA.Services
             // RabbitMQ v7 Async Connection & Channel
             var connection = await _factory.CreateConnectionAsync(stoppingToken);
             var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
+            //rabbit queue declaration 
+            // Quarantina Boxes 
+            ///DLX 
+            var dlxExchange="order-dlx";
+            await channel.ExchangeDeclareAsync(
+                exchange:dlxExchange,
+                type:ExchangeType.Direct,
+                durable:true,
+                autoDelete:false,
+                cancellationToken:stoppingToken
+            );
+            //DLQ
+            var dlqQueue="order-dead-letter-queue";
+            await channel.QueueDeclareAsync(
+                queue:dlqQueue,
+                durable:true,
+                exclusive:false,
+                autoDelete:false,
+                arguments:null,
+                cancellationToken:stoppingToken
+            );
+            var dlqRoutingKey="order-dl-key";
+            await channel.QueueBindAsync(
+                queue:dlqQueue,
+                exchange:dlxExchange,
+                routingKey:dlqRoutingKey,
+                cancellationToken:stoppingToken
+            );
+            //adding to main queue : post dlx if there is error
+            var mainQueueArgs=new Dictionary<string,object?>
+            {
+                {"x-dead-letter-exchange",dlxExchange},
+                {"x-dead-letter-routing-key",dlqRoutingKey}
+            };
+            //main queue declaration with rules above
+            var mainQueue=RabbitMQPublisher.QueueName;
+
+
 
             await channel.QueueDeclareAsync(
-                queue: RabbitMQPublisher.QueueName,
+                queue: mainQueue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null,
+                arguments: mainQueueArgs,
                 cancellationToken: stoppingToken
             );
 
@@ -50,6 +88,9 @@ namespace MongoRabbitA.Services
             {
                 try
                 {
+                    //test line for error 
+                    //throw new Exception("Simulated fatal database error");
+
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
                     var orderEvent = JsonSerializer.Deserialize<OrderCreateEvent>(message);
@@ -87,7 +128,7 @@ namespace MongoRabbitA.Services
 
             // 1. Start listening to the queue (MUST be outside ReceivedAsync)
             await channel.BasicConsumeAsync(
-                queue: RabbitMQPublisher.QueueName,
+                queue: mainQueue,
                 autoAck: false,
                 consumer: consumer,
                 cancellationToken: stoppingToken
