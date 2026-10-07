@@ -5,6 +5,9 @@ namespace MongoRabbitA.DTOs.OrderDTOs
     {
         [Required]
         public string ProductId {get;set;}=string.Empty;
+
+      
+        
         [Range(1,int.MaxValue,ErrorMessage ="Amount must be at least 1")]
         public int Amount {get;set;}
     }

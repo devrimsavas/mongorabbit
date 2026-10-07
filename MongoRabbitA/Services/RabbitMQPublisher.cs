@@ -19,7 +19,7 @@ namespace MongoRabbitA.Services
             var hostName=config["RabbitMQ:HostName"] ?? "localhost";
             _factory=new ConnectionFactory {HostName=hostName};
         }
-        public async Task PublishOrderCreatedAsync(OrderCreateEvent orderEvent)
+        public async Task PublishOrderCreatedAsync(OrderCreateEvent orderEvent,string correlationId)
         {
             //rabbit 7:create connection and channel async 
             using var connection=await _factory.CreateConnectionAsync();
@@ -37,10 +37,18 @@ namespace MongoRabbitA.Services
             //serialize event model to JSON bytes
             var jsonString=JsonSerializer.Serialize(orderEvent);
             var body=Encoding.UTF8.GetBytes(jsonString);
+            var properties=new BasicProperties
+            {
+                CorrelationId=correlationId
+            };
+
+
             //publish message 
             await channel.BasicPublishAsync(
                 exchange:string.Empty,
                 routingKey:QueueName,
+                mandatory:false,
+                basicProperties:properties,
                 body:body
             );
         }

@@ -33,18 +33,27 @@ namespace MongoRabbitA.Services
         }
 
         // Create order
-        public async Task<Order> CreateOrderAsync(CreateOrderDTO dto)
+        public async Task<Order> CreateOrderAsync(CreateOrderDTO dto,string correlationId)
         {
             var order = new Order
             {
-                ProductId = dto.ProductId,
+                ProductId = dto.ProductId,                
                 Amount = dto.Amount,
+                CorrelationId=correlationId,
                 OrderStatus = OrderStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
 
             await _orders.InsertOneAsync(order);
             return order;
+        }
+        //get orderby id 
+        public async Task<Order?> GetOrderByCorrelationIdAsync(string correlationId)
+        {
+            var filter=Builders<Order>.Filter.Eq(p=>p.CorrelationId,correlationId);
+            var order=await _orders.Find(filter).FirstOrDefaultAsync();
+            return order;
+
         }
 
         // Update status for RabbitMQ flow

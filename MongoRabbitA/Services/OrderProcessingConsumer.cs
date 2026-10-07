@@ -86,6 +86,8 @@ namespace MongoRabbitA.Services
 
             consumer.ReceivedAsync += async (sender, ea) =>
             {
+                //extract correlation ID from message headers 
+                var correlationId=ea.BasicProperties?.CorrelationId ?? "No-Correlation-Id";
                 try
                 {
                     //test line for error 
@@ -97,7 +99,7 @@ namespace MongoRabbitA.Services
 
                     if (orderEvent != null)
                     {
-                        _logger.LogInformation("Processing order {OrderId} for product {ProductId}", orderEvent.OrderId, orderEvent.ProductId);
+                        _logger.LogInformation("[{CorrelationId}]Processing order {OrderId} for product {ProductId}", correlationId,orderEvent.OrderId, orderEvent.ProductId);
                         
                         var updatedProduct = await _productService.UpdateStock(orderEvent.ProductId, -orderEvent.Amount);
 
@@ -105,13 +107,13 @@ namespace MongoRabbitA.Services
                         {
                             //stock sufficient decrease stock 
                             await _orderService.UpdateOrderStatusAsync(orderEvent.OrderId,OrderStatus.Completed);
-                            _logger.LogInformation(" Order {OrderId} Completed. Remaining stock: {Stock}", orderEvent.OrderId,updatedProduct.QuantityInStock);
+                            _logger.LogInformation("[{CorrelationId}] Order {OrderId} Completed. Remaining stock: {Stock}", correlationId,orderEvent.OrderId,updatedProduct.QuantityInStock);
                         }
                         else
                         {
                             //Stock insufficient.Cancel Order
                             await _orderService.UpdateOrderStatusAsync(orderEvent.OrderId,OrderStatus.Cancelled);
-                            _logger.LogWarning("Insufficient stock or product not found for ProductId: {ProductId}", orderEvent.ProductId);
+                            _logger.LogWarning("[{CorrelationId}] Insufficient stock or product not found for ProductId: {ProductId}", correlationId,orderEvent.ProductId);
                         }
                     }
 
@@ -120,7 +122,7 @@ namespace MongoRabbitA.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to process message {DeliveryTag}", ea.DeliveryTag);
+                    _logger.LogError(ex, "[{CorrelationId}]Failed to process message {DeliveryTag}",correlationId, ea.DeliveryTag);
                     //requeue false: this message is wrong. delete from queue
                     await channel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
                 }

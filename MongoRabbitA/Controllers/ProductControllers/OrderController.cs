@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MongoRabbitA.DTOs.OrderDTOs;
 using MongoRabbitA.Models;
 using MongoRabbitA.Services;
+
 
 namespace MongoRabbitA.Controllers
 {
@@ -11,11 +13,14 @@ namespace MongoRabbitA.Controllers
     {
         private readonly MongoOrderService _orderService;
         private readonly RabbitMQPublisher _rabbitPublisher;
+        private readonly ILogger<OrderController> _logger;
 
-        public OrderController(MongoOrderService orderService,RabbitMQPublisher rabbitPublisher)
+        public OrderController(MongoOrderService orderService,RabbitMQPublisher rabbitPublisher,ILogger<OrderController> logger)
         {
             _orderService = orderService;
             _rabbitPublisher=rabbitPublisher;
+            _logger=logger;
+
         }
 
         // GET /api/Order
@@ -26,11 +31,26 @@ namespace MongoRabbitA.Controllers
             return Ok(orders);
         }
 
+        //GET order by Correlation Id
+        [HttpGet("correlation/{correlationId}")]
+        public async Task<ActionResult<Order>> GetOrderByCorrelationId(string correlationId)
+        {
+            var order=await _orderService.GetOrderByCorrelationIdAsync(correlationId);
+            if (order==null)
+            {
+                return NotFound($"Order with CorrelationId {correlationId} not found") ;
+            }
+            return Ok(order);
+        }
+
         // POST /api/Order
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder([FromBody] CreateOrderDTO dto)
         {
-            var createdOrder = await _orderService.CreateOrderAsync(dto);
+            var correlationId=Guid.NewGuid().ToString();
+            //request came log with Id 
+            _logger.LogInformation("[{CorrelationId}] Order creation initiated for ProductId: {ProductId}", correlationId, dto.ProductId);
+            var createdOrder = await _orderService.CreateOrderAsync(dto,correlationId);
 
             //publish event to RabbitMQ
             var orderEvent=new OrderCreateEvent
@@ -39,10 +59,12 @@ namespace MongoRabbitA.Controllers
                 ProductId=createdOrder.ProductId,
                 Amount=createdOrder.Amount
             };
-            await _rabbitPublisher.PublishOrderCreatedAsync(orderEvent);
+            await _rabbitPublisher.PublishOrderCreatedAsync(orderEvent,correlationId);
+            
 
             // Returns 201 Created
             return CreatedAtAction(nameof(GetAllOrders), new { id = createdOrder.Id }, createdOrder);
         }
+
     }
 }

@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using MongoRabbitA.Models;
 using MongoRabbitA.Services;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 
 
@@ -32,7 +33,15 @@ builder.Services.AddHostedService<OrderProcessingConsumer>();
 
 
 //controllers added 
-builder.Services.AddControllers();
+
+//very important note Controllers options allows us to see status instead of status no 
+// useful 
+builder.Services.AddControllers()
+.AddJsonOptions(options=>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+}
+);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options=>
@@ -54,6 +63,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

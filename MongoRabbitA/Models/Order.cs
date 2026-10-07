@@ -15,6 +15,8 @@ namespace MongoRabbitA.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id {get;set;}
+        
+        public string CorrelationId{get;set;}=string.Empty;
         [Required]
         [BsonRepresentation(BsonType.ObjectId)]
         public string ProductId {get;set;}=null!;
