@@ -1,0 +1,25 @@
+name: mongorabbit
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    testbackend:
+        runs-on: ubuntu-latest
+        steps: 
+         -  name: Checkout Code
+            uses: actions/checkout@v5 
+
+         -  name: Setup .Net 
+            uses: actions/setup-dotnet@v4
+            with: 
+                dotnet-version: '9.0.x'
+         -  name:  install dependencies
+            run: dotnet restore
+         -  name: Build
+            run: dotnet build 
+
+            
+

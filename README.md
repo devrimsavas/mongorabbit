@@ -4,11 +4,19 @@
 
 ### 1. Run RabbitMQ via Docker
 
-Run the RabbitMQ container with the management plugin enabled:
+**First time only:** create and start the RabbitMQ container with the management plugin enabled:
 
 ```bash
 docker run -d --name rabbitmq-server -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
+
+**Afterwards:** the container already exists, so just start it:
+
+```bash
+docker start rabbitmq-server
+```
+
+> If you get a `container name "/rabbitmq-server" is already in use` error, the container was created before. Use `docker start rabbitmq-server` instead of `docker run`.
 
 - **AMQP Port:** `5672` (Application communication)
 - **Management UI:** `http://localhost:15672` (Credentials: `guest` / `guest`)
