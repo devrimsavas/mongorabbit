@@ -1,5 +1,5 @@
 # APPLICATION OVERVIEW
-![Test](https://github.com/devrimsavas/mongorabbit/blob/main/.github/workflows/test.yml/badge.svg)
+![Test](https://github.com/devrimsavas/mongorabbit/actions/workflows/test.yml/badge.svg)
 
 ## RabbitMQ Integration (Async Queue Pattern)
 
